@@ -38,22 +38,27 @@ func ConvertRequest(request model.GeneralOpenAIRequest) *ChatRequest {
 	if request.TopP >= 1 {
 		request.TopP = 0.9999
 	}
+
+	parameters := Parameters{
+		EnableSearch:      enableSearch,
+		IncrementalOutput: request.Stream,
+		Seed:              uint64(request.Seed),
+		MaxTokens:         request.MaxTokens,
+		Temperature:       request.Temperature,
+		TopP:              request.TopP,
+		TopK:              request.TopK,
+		Tools:             request.Tools,
+	}
+	if strings.HasPrefix(aliModel, "qwen-") {
+		parameters.ResultFormat = "message"
+	}
+
 	return &ChatRequest{
 		Model: aliModel,
 		Input: Input{
 			Messages: messages,
 		},
-		Parameters: Parameters{
-			EnableSearch:      enableSearch,
-			IncrementalOutput: request.Stream,
-			Seed:              uint64(request.Seed),
-			MaxTokens:         request.MaxTokens,
-			Temperature:       request.Temperature,
-			TopP:              request.TopP,
-			TopK:              request.TopK,
-			ResultFormat:      "message",
-			Tools:             request.Tools,
-		},
+		Parameters: parameters,
 	}
 }
 
